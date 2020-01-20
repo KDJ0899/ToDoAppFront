@@ -1,16 +1,15 @@
 <template>
-  <div class="hello">
-    오늘 해야 할 일
-  {{toDoItems}}
+  <div class="about">
+  {{msg}}
   </div>
 </template>
 
 <script>
 export default {
-  name: 'hello',
+  name: 'about',
   data () {
     return {
-      toDoItems: ['1. 밥 먹기.', '2.잠 자기.']
+      msg: '내가 개발한 To Do 어플입니다.'
     }
   }
 }
