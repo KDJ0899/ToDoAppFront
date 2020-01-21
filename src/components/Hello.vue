@@ -11,10 +11,11 @@
         <b-container fluid>
           <b-row class="my-1">
             <b-col sm="10">
-              <b-form-input v-model="title" type="text" placeholder="새 할 일을 적으세요." />
+              <b-form-input v-model="newToDoItemRequest.title" type="text" 
+              placeholder="새 할 일을 적으세요." v-on:keyup.enter="createToDo" />
             </b-col>
             <b-col sm="2">
-              <b-button variant="outline-primary">추가</b-button>
+              <b-button variant="outline-primary" v-on:click="createToDo">추가</b-button>
             </b-col>
           </b-row>
         </b-container>
@@ -38,21 +39,43 @@
 <script>
 import axios from 'axios'
 
+let baseUrl = 'http://127.0.0.1:5000/todo/'
 export default {
   name: 'hello',
   data () {
     return {
-      toDoItems: []
+      toDoItems: [],
+      newToDoItemRequest: {}
+    }
+  },
+  methods: {
+    initToDoList: function () {
+      let vm = this
+      axios.get(baseUrl)
+        .then(response => {
+          vm.toDoItems = response.data.map(r => r.data)// 반환되는 값을 toDoItems에 저장한다.
+        })
+        .catch(e => {
+          console.log('error : ', e)// 에러가 나는 경우 콘솔에 에러를 출력한다
+        })
+    },
+    createToDo: function (event) {
+      event.preventDefault()
+      let vm = this
+      if (!vm.newToDoItemRequest.title) return
+      axios.post(baseUrl, vm.newToDoItemRequest)
+        .then(response => {
+          console.log(response)
+          vm.initToDoList()
+          vm.newToDoItemRequest = {}
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
   },
   created () { // 초기화 함수를 정의 한다.
-    axios.get('http://127.0.0.1:5000/todo/') // http://localhost:5000/todo/에 get call을 한다.
-      .then(response => {
-        this.toDoItems = response.data.map(r => r.data)// 반환되는 값을 toDoItems에 저장한다.
-      })
-      .catch(e => {
-        console.log('error : ', e)// 에러가 나는 경우 콘솔에 에러를 출력한다
-      })
+    this.initToDoList()
   }
 }
 </script>
